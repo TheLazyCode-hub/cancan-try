@@ -16,10 +16,6 @@
 </p>
 
 <p>=-------------------------------------------********************************************_-------------------------------</p>
-<% current_user.roles.each do |role| %>
-  <%= role.name %>
-<% end %>
-
 
   <% if @post.latest_authorized_version.present? %>
     <h1><%= @post.latest_authorized_version.title %></h1>

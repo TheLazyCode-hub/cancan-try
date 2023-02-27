@@ -16,24 +16,22 @@ class PostsController < ApplicationController
     latest_authorized_version = @post.versions.where(status: 'authorized').last
     
     if latest_authorized_version.present?
-      # If there is an authorized version, restore the post to that version
       @post = latest_authorized_version.reify
     end
 
-    # Get the current user
     current_user = current_user_helper
 
     if current_user.present?
       if current_user.roles.exists?(name: "authorizer")
-        # If the current user is an authorizer, mark the latest version as authorized
         latest_version = @post.versions.last
         latest_version.update(status: "authorized") if latest_version.present?
         flash[:notice] = "Post authorized successfully."
       elsif current_user.roles.exists?(name: "verifier")
-        # If the current user is a verifier, mark the latest version as verified
         latest_version = @post.versions.last
         latest_version.update(status: 'verified') if latest_version.present?
         flash[:notice] = "Post verified successfully. Waiting for authorization."
+      else
+        flash[:notice] = "Post under-verification"
       end
     end
 
@@ -71,17 +69,18 @@ class PostsController < ApplicationController
 
   # PATCH/PUT /posts/1 or /posts/1.json
   def update
-    respond_to do |format|
+    # respond_to do |format|
       if @post.update(post_params)
         # format.html { redirect_to post_url(@post), notice: "Post was successfully updated." }
         # format.json { render :show, status: :ok, location: @post }
         flash[:notice] = "Post updated successfully."
         redirect_to @post
       else
-        format.html { render :edit, status: :unprocessable_entity }
-        format.json { render json: @post.errors, status: :unprocessable_entity }
+        # format.html { render :edit, status: :unprocessable_entity }
+        # format.json { render json: @post.errors, status: :unprocessable_entity }
+        render :edit
       end
-    end
+    # end
   end
 
   # DELETE /posts/1 or /posts/1.json

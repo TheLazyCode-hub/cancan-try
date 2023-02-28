@@ -1,0 +1,69 @@
+<p id="notice"><%= notice %></p>
+<h1>This is 
+
+<% if current_user.roles.exists?(name: "verifier") %>
+verifier pending 
+<% elsif current_user.roles.exists?(name: "authorizer") %>
+authorizer pending
+<% end %>
+ dashboard </h1>
+<hr>
+<h2>Data</h2>
+<ul>
+  <li>Pending Approval: <%= Approval.where(status: "pending", approvable_type: 'Post').count %></li>
+  <li>Verified: <%= Approval.where(status: "verified", approvable_type: 'Post').count %></li>
+  <li>Authorized: <%= Approval.where(status: "authorized", approvable_type: 'Post').count %></li>
+</ul>
+<hr>
+
+<% if current_user.roles.exists?(name: "verifier") %>
+
+<% @pending_approvals.each do |approval| %>
+    <% post = Post.find(approval.approvable_id) %>
+    <p>
+        <strong>Title</strong>
+        <%= post.title %>
+    </p>
+    <p>
+        <strong>Body</strong>
+        <%= post.body %>
+    </p>
+    <p>
+        <strong>Status</strong>
+        <%= approval.status %>
+    </p>
+
+    <%= button_to "Verify", verify_post_path(id: post.id), method: :post, data: { confirm: 'Are you sure?' } %>
+
+    
+    <button>Decline</button>
+
+    <hr>
+<% end %>
+
+<% end %>
+
+<% if current_user.roles.exists?(name: "authorizer") %>
+<% @authorize_approvals.each do |approval| %>
+    <% post = Post.find(approval.approvable_id) %>
+    <p>
+        <strong>Title</strong>
+        <%= post.title %>
+    </p>
+    <p>
+        <strong>Body</strong>
+        <%= post.body %>
+    </p>
+    <p>
+        <strong>Status</strong>
+        <%= approval.status %>
+    </p>
+
+   
+    <%= button_to "Authorize", authorize_post_path(id: post.id), method: :post, data: { confirm: 'Are you sure?' } %>
+    
+    <button>Decline</button>
+
+    <hr>
+<% end %>
+<% end %>

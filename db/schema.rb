@@ -10,7 +10,16 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2023_02_27_002006) do
+ActiveRecord::Schema.define(version: 2023_02_28_001346) do
+
+  create_table "approvals", force: :cascade do |t|
+    t.string "approvable_type"
+    t.integer "approvable_id"
+    t.string "status", default: "pending"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["approvable_type", "approvable_id"], name: "index_approvals_on_approvable"
+  end
 
   create_table "posts", force: :cascade do |t|
     t.string "title"

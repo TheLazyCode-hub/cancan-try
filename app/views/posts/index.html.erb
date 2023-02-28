@@ -8,6 +8,7 @@
       <th>Title</th>
       <th>Body</th>
       <th>User</th>
+      <th>Status</th>
       <th colspan="3"></th>
     </tr>
   </thead>
@@ -18,6 +19,12 @@
         <td><%= post.title %></td>
         <td><%= post.body %></td>
         <td><%= post.user_id %></td>
+        <% if can? :update, post %> 
+          <% authorize_approvals = Approval.where(approvable_id:  post.id).last %>
+          <td><%= authorize_approvals.status %></td> 
+        <% else %> 
+          <td></td> 
+        <% end %>
         <td><%= link_to 'Show', post %></td>
        <% if can? :update, post %> <td><%= link_to 'Edit', edit_post_path(post) %></td> <% end %>
        <% if can? :update, post %>  <td><%= link_to 'Destroy', post, method: :delete, data: { confirm: 'Are you sure?' } %></td> 

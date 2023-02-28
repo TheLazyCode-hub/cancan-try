@@ -21,19 +21,19 @@ class PostsController < ApplicationController
 
     current_user = current_user_helper
 
-    if current_user.present?
-      if current_user.roles.exists?(name: "authorizer")
-        latest_version = @post.versions.last
-        latest_version.update(status: "authorized") if latest_version.present?
-        flash[:notice] = "Post authorized successfully."
-      elsif current_user.roles.exists?(name: "verifier")
-        latest_version = @post.versions.last
-        latest_version.update(status: 'verified') if latest_version.present?
-        flash[:notice] = "Post verified successfully. Waiting for authorization."
-      else
-        flash[:notice] = "Post under-verification"
-      end
-    end
+    # if current_user.present?
+    #   if current_user.roles.exists?(name: "authorizer")
+    #     latest_version = @post.versions.last
+    #     latest_version.update(status: "authorized") if latest_version.present?
+    #     flash[:notice] = "Post authorized successfully."
+    #   elsif current_user.roles.exists?(name: "verifier")
+    #     latest_version = @post.versions.last
+    #     latest_version.update(status: 'verified') if latest_version.present?
+    #     flash[:notice] = "Post verified successfully. Waiting for authorization."
+    #   else
+    #     flash[:notice] = "Post under-verification"
+    #   end
+    # end
 
     # Render the post
     render :show
@@ -57,6 +57,7 @@ class PostsController < ApplicationController
       if @post.save
         # format.html { redirect_to post_url(@post), notice: "Post was successfully created." }
         # format.json { render :show, status: :created, location: @post }
+        @approval = Approval.create(status: "pending", approvable: @post)
         flash[:notice] = "Post created successfully."
         redirect_to @post
       else
@@ -85,6 +86,8 @@ class PostsController < ApplicationController
 
   # DELETE /posts/1 or /posts/1.json
   def destroy
+    @approval = Approval.where(approvable_id:  @post.id)
+    @approval.delete_all
     @post.destroy
 
     respond_to do |format|
